@@ -38,13 +38,10 @@ public class PointsTable {
     public void update() {
 
         List<List<Double>> newValues = mainFrame.getValues();
-
         model = new DefaultTableModel(columns, 0);
         table.setModel(model);
-
         for (int index = 0; index < mainFrame.getValues().size(); index++) {
             Vector<Double> vector = new Vector<Double>();
-
             vector.add(newValues.get(index).get(0));
             vector.add(newValues.get(index).get(1));
             model.addRow(vector);

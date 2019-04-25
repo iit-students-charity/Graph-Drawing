@@ -9,6 +9,7 @@ public class LinearFunction implements Runnable {
     public double endI;
     public double h = 0.1;
     public Controller controller;
+    public static final int FUNCTION_ID = 0;
 
     public LinearFunction(Controller controller) {
 

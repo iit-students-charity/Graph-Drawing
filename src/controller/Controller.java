@@ -18,13 +18,10 @@ public class Controller {
         window.update();
     }
 
-    public synchronized void addValueOnPlace(int place, double x, double fx) {
-        window.addValueOnPlace(place, x, fx);
-        window.update();
-    }
 
     public List<List<Double>> getValues() {
         return window.getValues();
+
     }
 
     public synchronized void clear() {

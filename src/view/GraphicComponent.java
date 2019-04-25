@@ -62,10 +62,8 @@ public class GraphicComponent extends JPanel {
             int newPrevX = (int) (10 * prevX);
             graph.setColor(Color.BLUE);
             int drawPrevX = center.width + 4 * newPrevX;
-            /*0.02 **/
             int drawPrevY = center.height - newprevFx;
             int drawX = center.width + 4 * newX;
-            /*0.02 * */
             int drawY = center.height - newFx;
             graph.drawLine(drawPrevX, drawPrevY, drawX, drawY);
             graph.setColor(Color.DARK_GRAY);
@@ -100,6 +98,10 @@ public class GraphicComponent extends JPanel {
         newPoints.add(0, x);
         newPoints.add(1, fx);
         values.set(place, newPoints);
+    }
+
+    void update() {
+
     }
 
     public void clear() {

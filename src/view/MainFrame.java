@@ -5,8 +5,6 @@ import model.LinearFunction;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.List;
 
 public class MainFrame {
@@ -49,21 +47,18 @@ public class MainFrame {
         scroll.getViewport().addMouseMotionListener(listener);
         ZoomListener zoomListener = new ZoomListener(MainFrame.this, graphic, taskPanel);
         scroll.addMouseWheelListener(zoomListener);
-        taskPanel.getMainButton().addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent event) {
-                try {
-                    if (taskPanel.getValueXBeg().equals("") || taskPanel.getValueXEnd().equals("")
-                            || Integer.valueOf(taskPanel.getValueXBeg()) >= Integer
-                            .valueOf(taskPanel.getValueXEnd())) {
-                        JOptionPane.showMessageDialog(null, "Введите корректные данные");
-                    } else {
-                        graphic.clear();
-                        startCalculation();
-                    }
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
+        taskPanel.getMainButton().addActionListener(event -> {
+            try {
+                if (taskPanel.getValueXBeg().equals("") || taskPanel.getValueXEnd().equals("")
+                        || Integer.valueOf(taskPanel.getValueXBeg()) >= Integer
+                        .valueOf(taskPanel.getValueXEnd())) {
+                    JOptionPane.showMessageDialog(null, "Введите корректные данные");
+                } else {
+                    graphic.clear();
+                    startCalculation();
                 }
+            } catch (InterruptedException e) {
+                e.printStackTrace();
             }
         });
         return frame;
@@ -127,7 +122,6 @@ public class MainFrame {
                 graphic.setSize(newSize);
             }
         }
-
         frame.repaint();
         mainPointsTable.update();
     }
