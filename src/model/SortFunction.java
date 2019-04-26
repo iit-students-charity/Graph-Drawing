@@ -2,21 +2,31 @@ package model;
 
 import controller.Controller;
 
-public class SortFunction implements Runnable {
+import java.util.Random;
+
+public class SortFunction {
     public static final int FUNCTION_ID = 1;
+    private static final int OLEG = 100000000;
     private int n; //длина массивов
     private int k; //количество сортируемых массивов
+    private int currentArraySize;
     private Controller controller;
 
     public SortFunction(int n, int k, Controller controller) {
         this.n = n;
         this.k = k;
+        this.currentArraySize = 2;
         this.controller = controller;
     }
 
-    @Override
-    public void run() {
-
+    public void countStep() {
+        int commonTime = 0;
+        int currentStep = 1;
+        for (int i = 0; i < currentStep; i++) {
+            commonTime += sortTime(generateRandomArray());
+        }
+        int averageTime = commonTime / currentStep;
+        currentArraySize++;
     }
 
     private void countingSort(int[] arrayToSort) {
@@ -27,8 +37,8 @@ public class SortFunction implements Runnable {
 
         // Create a count array to store count of individual
         // characters and initialize count array as 0
-        int count[] = new int[256];
-        for (int i = 0; i < 256; ++i)
+        int count[] = new int[currentArraySize];
+        for (int i = 0; i < currentArraySize; ++i)
             count[i] = 0;
 
         // store count of each character
@@ -37,7 +47,7 @@ public class SortFunction implements Runnable {
 
         // Change count[i] so that count[i] now contains actual
         // position of this character in output array
-        for (int i = 1; i <= 255; ++i)
+        for (int i = 1; i <= currentArraySize - 1; ++i)
             count[i] += count[i - 1];
 
         // Build the output character array
@@ -53,10 +63,19 @@ public class SortFunction implements Runnable {
             arrayToSort[i] = output[i];
     }
 
-    private long sortTime(int[] arrayToSort) {
+    private int sortTime(int[] arrayToSort) {
         long startTime = System.nanoTime();
         countingSort(arrayToSort);
         long endTime = System.nanoTime();
-        return endTime - startTime;
+        return (int) (endTime - startTime) / OLEG;
+    }
+
+    private int[] generateRandomArray() {
+        int[] result = new int[currentArraySize];
+        Random random = new Random();
+        for (int i = 0; i < result.length; i++) {
+            result[i] = random.nextInt(currentArraySize);
+        }
+        return result;
     }
 }
