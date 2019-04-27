@@ -2,31 +2,76 @@ package model;
 
 import controller.Controller;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
+import java.util.concurrent.locks.Lock;
 
-public class SortFunction {
+public class SortFunction implements Runnable {
     public static final int FUNCTION_ID = 1;
-    private static final int OLEG = 100000000;
+    private static final int STRAP_DIGIT = 100;
     private int n; //длина массивов
     private int k; //количество сортируемых массивов
     private int currentArraySize;
     private Controller controller;
+    private Lock lock;
+    private List<GraphicPoint> data;
 
-    public SortFunction(int n, int k, Controller controller) {
+    public SortFunction(int n, int k, Lock lock) {
         this.n = n;
         this.k = k;
         this.currentArraySize = 2;
-        this.controller = controller;
+        this.lock = lock;
+        data = new ArrayList<>();
+    }
+
+    @Override
+    public void run() {
+        for (int currentSize = 2; currentSize < n; currentSize++) {
+            lock.lock();
+            currentArraySize = currentSize;
+            try {
+                int commonTime = 0;
+                int currentStep;
+                for (int currentArrayCount = 1; currentArrayCount < k; currentArrayCount++) {
+                    commonTime += sortTime(generateRandomArray());
+
+
+                }
+                int averageTime = commonTime / k;
+                data.add(new GraphicPoint(currentArraySize, averageTime));
+                System.out.print(currentArraySize);
+                System.out.print(" ");
+                System.out.println(averageTime);
+            } finally {
+                lock.unlock();
+            }
+            /*try {
+                Thread.sleep(500);
+            }
+            catch (InterruptedException e)
+            {
+                System.out.println("thread interrupted");
+            }*/
+
+        }
     }
 
     public void countStep() {
         int commonTime = 0;
         int currentStep = 1;
-        for (int i = 0; i < currentStep; i++) {
-            commonTime += sortTime(generateRandomArray());
+        lock.lock();
+        try {
+            for (int i = 0; i < currentStep; i++) {
+                commonTime += sortTime(generateRandomArray());
+            }
+            int averageTime = commonTime / currentStep;
+            currentArraySize++;
+            data.add(new GraphicPoint(currentArraySize, averageTime));
+
+        } finally {
+            lock.unlock();
         }
-        int averageTime = commonTime / currentStep;
-        currentArraySize++;
     }
 
     private void countingSort(int[] arrayToSort) {
@@ -63,11 +108,11 @@ public class SortFunction {
             arrayToSort[i] = output[i];
     }
 
-    private int sortTime(int[] arrayToSort) {
+    private long sortTime(int[] arrayToSort) {
         long startTime = System.nanoTime();
         countingSort(arrayToSort);
         long endTime = System.nanoTime();
-        return (int) (endTime - startTime) / OLEG;
+        return (endTime - startTime) / STRAP_DIGIT;
     }
 
     private int[] generateRandomArray() {
@@ -75,6 +120,17 @@ public class SortFunction {
         Random random = new Random();
         for (int i = 0; i < result.length; i++) {
             result[i] = random.nextInt(currentArraySize);
+        }
+        return result;
+    }
+
+    public List<GraphicPoint> getData() {
+        List<GraphicPoint> result;
+        lock.lock();
+        try {
+            result = this.data;
+        } finally {
+            lock.unlock();
         }
         return result;
     }

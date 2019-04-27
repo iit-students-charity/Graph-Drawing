@@ -1,19 +1,19 @@
 package model;
 
 public class GraphicPoint {
-    private int x;
-    private int y;
+    private double x;
+    private double y;
 
-    public GraphicPoint(int x, int y) {
+    public GraphicPoint(double x, double y) {
         this.x = x;
         this.y = y;
     }
 
-    public int getX() {
+    public double getX() {
         return x;
     }
 
-    public int getY() {
+    public double getY() {
         return y;
     }
 }

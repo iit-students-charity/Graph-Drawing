@@ -6,6 +6,7 @@ import model.LinearFunction;
 import javax.swing.*;
 import java.awt.*;
 import java.util.List;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class MainFrame {
     public JFrame frame;
@@ -18,9 +19,11 @@ public class MainFrame {
     public GraphicComponent graphic;
     public LinearFunction calc;
     public JScrollPane scroll;
+    private ReentrantLock lock;
 
     public MainFrame() {
-        controller = new Controller(MainFrame.this);
+        lock = new ReentrantLock();
+        controller = new Controller(MainFrame.this, lock);
         frame = new JFrame();
         taskPanel = new TaskPanel();
     }
@@ -32,7 +35,7 @@ public class MainFrame {
         frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         frame.setLocationRelativeTo(null);
         frame.getContentPane().setLayout(new BorderLayout());
-        graphic = new GraphicComponent();
+        graphic = new GraphicComponent(controller);
         mainPointsTable = new PointsTable(this);
         scroll = new JScrollPane(graphic);
         scroll.setPreferredSize(new Dimension(605, 505));
@@ -65,66 +68,10 @@ public class MainFrame {
     }
 
     public void startCalculation() throws InterruptedException {
-        if (isInt(taskPanel.getValueXBeg()) == false || isInt(taskPanel.getValueXEnd()) == false) {
-            JOptionPane.showMessageDialog(null, "Введите корректные данные");
-            return;
-        } else {
-            tempXBeg = taskPanel.getXBegin();
-            controller.setXBeg(tempXBeg);
-            tempXEnd = taskPanel.getXEnd();
-            controller.setXEnd(tempXEnd);
-        }
-        calc = new LinearFunction(controller);
-        Thread thread = new Thread(calc);
-        thread.start();
+        controller.startLinearFunctionThread();
+        //controller.startSortFunctionThread();
     }
 
-    public void update() {
-        List<List<Double>> values = controller.getValues();
-        if (values.size() == 1 + 10 * (Integer.valueOf(taskPanel.getValueXEnd()) - Integer.valueOf(taskPanel.getValueXBeg()))) {
-            double maxY = Math.abs((values.get(0)).get(1));
-            double maxX = Math.abs((values.get(0)).get(0));
-            for (int index = 0; index < values.size(); index++) {
-                if (Math.abs((values.get(index)).get(1)) > maxY)
-                    maxY = Math.abs((values.get(index)).get(1));
-                if (Math.abs((values.get(index)).get(0)) > maxX)
-                    maxX = Math.abs((values.get(index)).get(0));
-            }
-            int newFx = (int) (10 * maxY);
-            int newX = (int) (10 * maxX);
-            Dimension firstSize = new Dimension(602, 502);
-            int drawY = (int) (firstSize.getHeight() / 2 - /*0.02 **/ newFx * 2);
-            int drawX = (int) (firstSize.getWidth() / 2 + 4 * newX);
-            if (Math.abs(drawY) > firstSize.getHeight() && Math.abs(drawX) > firstSize.getWidth()) {
-                Dimension newSize = new Dimension((Math.abs(drawX) * 2), (int) (Math.abs(drawY) * 2.5));
-                graphic.changeFirstSize(newSize);
-                graphic.setPreferredSize(newSize);
-                graphic.setSize(newSize);
-            } else if (Math.abs(drawY) > firstSize.getHeight()) {
-                Dimension newSize = new Dimension(graphic.getWidth(), (Math.abs(drawY) * 3));
-                graphic.changeFirstSize(newSize);
-                graphic.setPreferredSize(newSize);
-                graphic.setSize(newSize);
-            } else if (drawY < 0) {
-                Dimension newSize = new Dimension(graphic.getWidth(), (int) (502 + Math.abs(drawY) * 2.5));
-                graphic.changeFirstSize(newSize);
-                graphic.setPreferredSize(newSize);
-                graphic.setSize(newSize);
-            } else if (Math.abs(drawX) > firstSize.getWidth()) {
-                Dimension newSize = new Dimension((Math.abs(drawX) * 2), graphic.getHeight());
-                graphic.changeFirstSize(newSize);
-                graphic.setPreferredSize(newSize);
-                graphic.setSize(newSize);
-            } else if (Math.abs(drawY) <= 502 && Math.abs(drawX) <= 602) {
-                Dimension newSize = new Dimension(602, 502);
-                graphic.changeFirstSize(newSize);
-                graphic.setPreferredSize(newSize);
-                graphic.setSize(newSize);
-            }
-        }
-        frame.repaint();
-        mainPointsTable.update();
-    }
 
     public void repaintGraph() {
         frame.repaint();
@@ -157,5 +104,9 @@ public class MainFrame {
         } catch (NumberFormatException e) {
             return false;
         }
+    }
+
+    public ReentrantLock getLock() {
+        return lock;
     }
 }

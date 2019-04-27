@@ -1,5 +1,7 @@
 package view;
 
+import controller.Controller;
+
 import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
@@ -15,8 +17,9 @@ public class GraphicComponent extends JPanel {
     public Dimension size;
     public Dimension center;
     public int initialFontSize = 9;
+    private Controller controller;
 
-    public GraphicComponent() {
+    public GraphicComponent(Controller controller) {
         values = new ArrayList<>();
         size = new Dimension(width, height);
         center = new Dimension(width / 2, height / 2);
@@ -24,17 +27,13 @@ public class GraphicComponent extends JPanel {
         setSize(size);
         fontSize = 9;
         firstSize = new Dimension(600, 500);
+        this.controller = controller;
     }
 
-    @Override
-    public void paintComponent(Graphics graphic) {
-        super.paintComponent(graphic);
-        graphic.setColor(Color.DARK_GRAY);
-        size = new Dimension(this.getWidth(), this.getHeight());
-        center = new Dimension(size.width / 2, size.height / 2);
-        Graphics2D graph = (Graphics2D) graphic;
-        graph.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+    private void drawAxis(Graphics graph) {
+        //graph.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         graph.setFont(new Font("Comic Sans", Font.PLAIN, fontSize));
+        center = new Dimension(size.width / 2, size.height / 2);
         graph.drawLine(10, size.height / 2, size.width - 1, size.height / 2);
         graph.drawLine(size.width / 2, 10, size.width / 2, size.height - 1);
         graph.drawLine(size.width - 30, size.height / 2 - 10, size.width - 1, size.height / 2);
@@ -51,6 +50,16 @@ public class GraphicComponent extends JPanel {
         for (int index = 1; index < size.height / 20; index++) {
             graph.drawLine(size.width / 2 - 3, 22 * index, size.width / 2 + 3, 22 * index);
         }
+    }
+
+    @Override
+    public void paintComponent(Graphics graphic) {
+        setData();
+        super.paintComponent(graphic);
+        graphic.setColor(Color.DARK_GRAY);
+        size = new Dimension(this.getWidth(), this.getHeight());
+        Graphics2D graph = (Graphics2D) graphic;
+        drawAxis(graph);
         for (int index = 1; index < values.size(); index++) {
             double tempFx = (values.get(index)).get(1);
             double tempX = (values.get(index)).get(0);
@@ -98,6 +107,10 @@ public class GraphicComponent extends JPanel {
         newPoints.add(0, x);
         newPoints.add(1, fx);
         values.set(place, newPoints);
+    }
+
+    public void setData() {
+        this.values = controller.getLinearFunctionData();
     }
 
     void update() {

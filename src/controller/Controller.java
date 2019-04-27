@@ -1,21 +1,28 @@
 package controller;
 
+import model.GraphicPoint;
+import model.LinearFunction;
+import model.SortFunction;
 import view.MainFrame;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.locks.Lock;
 
 public class Controller {
     public MainFrame window;
     public double xBeg;
     public double xEnd;
+    private LinearFunction linearFunction;
+    private SortFunction sortFunction;
+    private Lock lock;
 
-    public Controller(MainFrame window) {
+    public Controller(MainFrame window, Lock lock) {
         this.window = window;
-    }
-
-    public synchronized void addValues(double x, double fx) {
-        window.addValues(x, fx);
-        window.update();
+        this.lock = lock;
+        this.linearFunction = new LinearFunction(lock);
+        this.sortFunction = new SortFunction(1, 2, lock);
     }
 
 
@@ -24,11 +31,27 @@ public class Controller {
 
     }
 
-    public synchronized void clear() {
-        if (window.getValues().isEmpty() == false)
-            window.clear();
-        window.update();
+
+    public List<List<Double>> getLinearFunctionData() {
+        List<List<Double>> result = new ArrayList<>();
+        for (GraphicPoint i : linearFunction.getData()) {
+            result.add(new ArrayList<>(Arrays.asList(i.getX(), i.getY())));
+        }
+        return result;
     }
+
+    public void startLinearFunctionThread() {
+        this.linearFunction = new LinearFunction(lock);
+        Thread LinearThread = new Thread(linearFunction);
+        LinearThread.start();
+    }
+
+    public void startSortFunctionThread() {
+        this.sortFunction = new SortFunction(500, 10000, lock);
+        Thread sortThread = new Thread(sortFunction);
+        sortThread.start();
+    }
+
 
 
     public void setXBeg(double xBeg) {
@@ -47,4 +70,6 @@ public class Controller {
     public double getXEnd() {
         return xEnd;
     }
+
+
 }
