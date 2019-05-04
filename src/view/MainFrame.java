@@ -1,6 +1,7 @@
 package view;
 
 import controller.Controller;
+import model.GraphicPoint;
 import model.LinearFunction;
 
 import javax.swing.*;
@@ -29,6 +30,7 @@ public class MainFrame {
     }
 
     public JFrame buildFrame() {
+        frame.setTitle("Function Drawing =^_^=");
         frame.setPreferredSize(new Dimension(width, height));
         frame.setMinimumSize(new Dimension(width, height));
         frame.setMaximumSize(new Dimension(width, height));
@@ -52,14 +54,9 @@ public class MainFrame {
         scroll.addMouseWheelListener(zoomListener);
         taskPanel.getMainButton().addActionListener(event -> {
             try {
-                if (taskPanel.getValueXBeg().equals("") || taskPanel.getValueXEnd().equals("")
-                        || Integer.valueOf(taskPanel.getValueXBeg()) >= Integer
-                        .valueOf(taskPanel.getValueXEnd())) {
-                    JOptionPane.showMessageDialog(null, "Введите корректные данные");
-                } else {
-                    graphic.clear();
-                    startCalculation();
-                }
+                //graphic = new GraphicComponent(controller);
+                graphic.clear();
+                startCalculation();
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -73,20 +70,12 @@ public class MainFrame {
     }
 
 
-    public void repaintGraph() {
+    public void repaintFrame() {
         frame.repaint();
     }
 
-    public List<List<Double>> getValues() {
-        return graphic.getValues();
-    }
-
-    public void addValues(double x, double fx) {
-        graphic.addValues(x, fx);
-    }
-
-    public void addValueOnPlace(int place, double x, double fx) {
-        graphic.addValueOnPlace(place, x, fx);
+    public List<GraphicPoint> getValues() {
+        return graphic.getValuesLinear();
     }
 
     public void clear() {
@@ -95,15 +84,6 @@ public class MainFrame {
 
     public void show() {
         frame.setVisible(true);
-    }
-
-    public boolean isInt(String value) throws NumberFormatException {
-        try {
-            Integer.parseInt(value);
-            return true;
-        } catch (NumberFormatException e) {
-            return false;
-        }
     }
 
     public ReentrantLock getLock() {

@@ -3,7 +3,6 @@ package view;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
-import java.util.List;
 import java.util.Vector;
 
 public class PointsTable {
@@ -35,16 +34,16 @@ public class PointsTable {
         return scrollPane;
     }
 
-    public void update() {
+    /*public void update() {
 
-        List<List<Double>> newValues = mainFrame.getValues();
+        List<List<GraphicPoint>> newValues = mainFrame.getValues();
         model = new DefaultTableModel(columns, 0);
         table.setModel(model);
         for (int index = 0; index < mainFrame.getValues().size(); index++) {
-            Vector<Double> vector = new Vector<Double>();
+            Vector<GraphicPoint> vector = new Vector<>();
             vector.add(newValues.get(index).get(0));
             vector.add(newValues.get(index).get(1));
             model.addRow(vector);
         }
-    }
+    }*/
 }

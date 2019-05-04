@@ -23,7 +23,6 @@ public class ZoomListener implements MouseWheelListener {
             Dimension newSize = new Dimension(graphic.getWidth() + 150, graphic.getHeight() + 100);
             graphic.setPreferredSize(newSize);
             graphic.setSize(newSize);
-            int scale = (int) (Math.abs(graphic.getSize().getHeight() / 5 - 100));
             graphic.revalidate();
         }
         if (event.getPreciseWheelRotation() > 0 && KeyEvent.VK_CONTROL != 0) {
@@ -31,7 +30,7 @@ public class ZoomListener implements MouseWheelListener {
                 Dimension newSize = new Dimension(graphic.getWidth() - 150, graphic.getHeight() - 100);
                 graphic.setPreferredSize(newSize);
                 graphic.setSize(newSize);
-                mainFrame.repaintGraph();
+                mainFrame.repaintFrame();
             }
         }
     }

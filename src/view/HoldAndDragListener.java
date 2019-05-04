@@ -8,6 +8,7 @@ import java.awt.event.MouseEvent;
 public class HoldAndDragListener extends MouseAdapter {
     public Point point;
     public GraphicComponent graphic;
+    private static final double COEFFICIENT = 0.05;
 
     public HoldAndDragListener(GraphicComponent graphic) {
         this.graphic = graphic;
@@ -28,8 +29,8 @@ public class HoldAndDragListener extends MouseAdapter {
 
                 Rectangle view = viewPort.getViewRect();
 
-                view.x += 0.05 * diffX;
-                view.y += 0.05 * diffY;
+                view.x += COEFFICIENT * diffX;
+                view.y += COEFFICIENT * diffY;
 
                 graphic.scrollRectToVisible(view);
             }

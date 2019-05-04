@@ -1,6 +1,7 @@
 package model;
 
 import controller.Controller;
+import view.GraphicComponent;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,13 +17,15 @@ public class SortFunction implements Runnable {
     private Controller controller;
     private Lock lock;
     private List<GraphicPoint> data;
+    private GraphicComponent graphicComponent;
 
-    public SortFunction(int n, int k, Lock lock) {
+    public SortFunction(int n, int k, Lock lock, GraphicComponent graphicComponent) {
         this.n = n;
         this.k = k;
         this.currentArraySize = 2;
         this.lock = lock;
         data = new ArrayList<>();
+        this.graphicComponent = graphicComponent;
     }
 
     @Override
@@ -39,7 +42,8 @@ public class SortFunction implements Runnable {
 
                 }
                 int averageTime = commonTime / k;
-                data.add(new GraphicPoint(currentArraySize, averageTime));
+                //data.add(new GraphicPoint(currentArraySize, averageTime));
+                graphicComponent.addValue(FUNCTION_ID, new GraphicPoint(currentArraySize, averageTime));
                 System.out.print(currentArraySize);
                 System.out.print(" ");
                 System.out.println(averageTime);
@@ -57,22 +61,6 @@ public class SortFunction implements Runnable {
         }
     }
 
-    public void countStep() {
-        int commonTime = 0;
-        int currentStep = 1;
-        lock.lock();
-        try {
-            for (int i = 0; i < currentStep; i++) {
-                commonTime += sortTime(generateRandomArray());
-            }
-            int averageTime = commonTime / currentStep;
-            currentArraySize++;
-            data.add(new GraphicPoint(currentArraySize, averageTime));
-
-        } finally {
-            lock.unlock();
-        }
-    }
 
     private void countingSort(int[] arrayToSort) {
         int n = arrayToSort.length;

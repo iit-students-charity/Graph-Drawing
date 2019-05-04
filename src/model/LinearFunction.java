@@ -1,24 +1,31 @@
 package model;
 
+import view.GraphicComponent;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.locks.Lock;
 
-public class LinearFunction implements Runnable {
+public class LinearFunction implements Runnable, Function {
 
     public double x;
     public double beginI;
     public double endI;
-    public double h = 0.1;
     private Lock lock;
+    private GraphicPoint firstPoint;
+    private GraphicPoint secondPoint;
     public static final int FUNCTION_ID = 0;
     private List<GraphicPoint> data;
+    private double step;
+    private GraphicComponent graphicComponent;
 
-    public LinearFunction(Lock lock) {
+    public LinearFunction(Lock lock, GraphicComponent graphic) {
         this.lock = lock;
         beginI = 0;
         endI = 500;
         this.data = new ArrayList<>();
+        this.step = 0.1;
+        this.graphicComponent = graphic;
     }
 
     public double function(double x) {
@@ -30,33 +37,37 @@ public class LinearFunction implements Runnable {
         double beginX = beginI;
         double endX = endI;
         double tempFx = 0;
-        double h = 0.1;
-        lock.lock();
-        try {
-            for (double x = beginX; x <= endX; x += h) {
-                tempFx = function(x);
-                tempFx = Math.round(tempFx * 10d) / 10d;
-                x = Math.round(x * 10d) / 10d;
-                data.add(new GraphicPoint(x, tempFx));
-                /*try {
+        for (double x = beginX; x <= endX; x += step) {
+            tempFx = function(x);
+            tempFx = Math.round(tempFx * 10d) / 10d;
+            x = Math.round(x * 10d) / 10d;
+            secondPoint = new GraphicPoint(x, tempFx);
+            data.add(secondPoint);
+            lock.lock();
+            try {
+                graphicComponent.addValue(FUNCTION_ID, secondPoint);
+                graphicComponent.repaint();
+            } finally {
+                lock.unlock();
+            }
+            try {
                     Thread.sleep(50);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
-                }*/
             }
-        } finally {
-            lock.unlock();
         }
+
     }
 
+
     public List<GraphicPoint> getData() {
-        lock.lock();
+        //lock.lock();
         List<GraphicPoint> result;
-        try {
-            result = this.data;
-        } finally {
-            lock.unlock();
-        }
+        //try {
+        result = this.data;
+        // } finally {
+        //    lock.unlock();
+        //}
         return result;
     }
 }

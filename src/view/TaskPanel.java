@@ -5,52 +5,33 @@ import java.awt.*;
 
 public class TaskPanel {
     public JPanel panel;
-    public JTextField xBeg;
-    public JTextField xEnd;
-    public JLabel labelXBeg;
-    public JButton button;
+    public JTextField nValue;
+    public JTextField kValue;
+    public JButton buttonStart;
+    JButton buttonStop;
 
     public TaskPanel() {
         panel = new JPanel();
-        xBeg = new JTextField(3);
-        xEnd = new JTextField(3);
-        labelXBeg = new JLabel("Область определения: ");
-        button = new JButton("Нарисовать");
+        nValue = new JTextField(3);
+        kValue = new JTextField(3);
+        buttonStart = new JButton("Рисовать");
+        buttonStop = new JButton("Остановить и очистить");
     }
 
     JPanel buildComponent() {
         panel.setPreferredSize(new Dimension(350, 400));
         panel.setOpaque(true);
-        panel.add(labelXBeg);
-        panel.add(xBeg);
-        panel.add(xEnd);
-        panel.add(button);
+        panel.add(nValue);
+        panel.add(kValue);
+        panel.add(buttonStart);
+        panel.add(buttonStop);
         panel.setVisible(true);
         return panel;
     }
 
     public JButton getMainButton() {
-        return button;
+        return buttonStart;
     }
 
 
-    public double getXBegin() {
-        double tempX = Integer.valueOf(xBeg.getText());
-        return tempX;
-    }
-
-
-    public double getXEnd() {
-        double tempX = Integer.valueOf(xEnd.getText());
-        return tempX;
-    }
-
-
-    public String getValueXBeg() {
-        return xBeg.getText();
-    }
-
-    public String getValueXEnd() {
-        return xEnd.getText();
-    }
 }

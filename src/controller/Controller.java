@@ -1,13 +1,9 @@
 package controller;
 
-import model.GraphicPoint;
 import model.LinearFunction;
 import model.SortFunction;
 import view.MainFrame;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 import java.util.concurrent.locks.Lock;
 
 public class Controller {
@@ -21,33 +17,19 @@ public class Controller {
     public Controller(MainFrame window, Lock lock) {
         this.window = window;
         this.lock = lock;
-        this.linearFunction = new LinearFunction(lock);
-        this.sortFunction = new SortFunction(1, 2, lock);
+        this.linearFunction = new LinearFunction(lock, window.graphic);
+        this.sortFunction = new SortFunction(1, 2, lock, window.graphic);
     }
 
-
-    public List<List<Double>> getValues() {
-        return window.getValues();
-
-    }
-
-
-    public List<List<Double>> getLinearFunctionData() {
-        List<List<Double>> result = new ArrayList<>();
-        for (GraphicPoint i : linearFunction.getData()) {
-            result.add(new ArrayList<>(Arrays.asList(i.getX(), i.getY())));
-        }
-        return result;
-    }
 
     public void startLinearFunctionThread() {
-        this.linearFunction = new LinearFunction(lock);
+        this.linearFunction = new LinearFunction(lock, window.graphic);
         Thread LinearThread = new Thread(linearFunction);
         LinearThread.start();
     }
 
     public void startSortFunctionThread() {
-        this.sortFunction = new SortFunction(500, 10000, lock);
+        this.sortFunction = new SortFunction(500, 10000, lock, window.graphic);
         Thread sortThread = new Thread(sortFunction);
         sortThread.start();
     }
