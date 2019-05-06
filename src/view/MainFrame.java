@@ -16,11 +16,23 @@ public class MainFrame {
     private int height = 700;
     public double tempXBeg, tempXEnd;
     private TaskPanel taskPanel;
-    public PointsTable mainPointsTable;
-    public GraphicComponent graphic;
+    private PointsTable mainPointsTable;
+    private GraphicComponent graphic;
     public LinearFunction calc;
     public JScrollPane scroll;
     private ReentrantLock lock;
+
+    public GraphicComponent getGraphic() {
+        return graphic;
+    }
+
+    public TaskPanel getTaskPanel() {
+        return taskPanel;
+    }
+
+    public PointsTable getMainPointsTable() {
+        return mainPointsTable;
+    }
 
     public MainFrame() {
         lock = new ReentrantLock();
@@ -54,18 +66,25 @@ public class MainFrame {
         scroll.addMouseWheelListener(zoomListener);
         taskPanel.getMainButton().addActionListener(event -> {
             try {
-                //graphic = new GraphicComponent(controller);
+                controller.stopThreads();
+                mainPointsTable.clear();
                 graphic.clear();
                 startCalculation();
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
         });
+        taskPanel.getButtonStop().addActionListener(event -> {
+            controller.stopThreads();
+            mainPointsTable.clear();
+            graphic.clear();
+        });
         return frame;
     }
 
     public void startCalculation() throws InterruptedException {
         controller.startLinearFunctionThread();
+        controller.startSortFunctionThread(taskPanel.getN(), taskPanel.getK());
         //controller.startSortFunctionThread();
     }
 

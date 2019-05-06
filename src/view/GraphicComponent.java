@@ -21,6 +21,8 @@ public class GraphicComponent extends JPanel {
     private Controller controller;
     private Graphics graph;
     private List<List<GraphicPoint>> functionsData;
+    private int UNIT_SEGMENT_COEFFICIENT = 15;
+    private int EXTEND_RATIO = 2000;
 
     public GraphicComponent(Controller controller) {
         valuesLinear = new ArrayList<GraphicPoint>();
@@ -28,12 +30,22 @@ public class GraphicComponent extends JPanel {
         center = new Dimension(width / 2, height / 2);
         setPreferredSize(size);
         setSize(size);
-        fontSize = 9;
+        fontSize = 8;
         firstSize = new Dimension(600, 500);
         this.controller = controller;
         functionsData = new ArrayList<>();
         functionsData.add(new ArrayList<>());
         functionsData.add(new ArrayList<>());
+    }
+
+    public void incrementUnitSegment() {
+        if (UNIT_SEGMENT_COEFFICIENT < 30)
+            this.UNIT_SEGMENT_COEFFICIENT++;
+    }
+
+    public void decrementUnitSegment() {
+        if (UNIT_SEGMENT_COEFFICIENT > 10)
+            this.UNIT_SEGMENT_COEFFICIENT--;
     }
 
     private void drawAxis(Graphics graph) {
@@ -47,19 +59,31 @@ public class GraphicComponent extends JPanel {
         graph.drawString("X", size.width - 20, size.height / 2 + 20);
         graph.drawString("Y", size.width / 2 - 20, 20);
         graph.drawString("0", size.width / 2 - 10, size.height / 2 + 10);
-        for (int index = (int) size.getWidth() / 2; index < size.width; index += 20) {
+        int counter = 1;
+        for (int index = (int) size.getWidth() / 2; index < size.width; index += UNIT_SEGMENT_COEFFICIENT) {
             graph.drawLine((index), size.height / 2, (index),
                     size.height / 2 + 3);
+            graph.drawString(Integer.toString(counter), index + UNIT_SEGMENT_COEFFICIENT, (int) size.getHeight() / 2 - 5);
+            counter++;
         }
-        for (int index = (int) size.getHeight() / 2; index < size.height; index += 20) {
+        counter = 1;
+        for (int index = (int) size.getHeight() / 2; index < size.height; index += UNIT_SEGMENT_COEFFICIENT) {
             graph.drawLine(size.width / 2 - 3, index, size.width / 2, index);
+            graph.drawString(Integer.toString(counter), (int) size.getWidth() / 2, index + UNIT_SEGMENT_COEFFICIENT);
+            counter++;
         }
-        for (int index = (int) size.getWidth() / 2; index > 0; index -= 20) {
+        counter = -1;
+        for (int index = (int) size.getWidth() / 2; index > 0; index -= UNIT_SEGMENT_COEFFICIENT) {
             graph.drawLine((index), size.height / 2, (index),
                     size.height / 2 + 3);
+            graph.drawString(Integer.toString(counter), index - UNIT_SEGMENT_COEFFICIENT, (int) size.getHeight() / 2 - 5);
+            counter--;
         }
-        for (int index = (int) size.getHeight() / 2; index > 0; index -= 20) {
+        counter = -1;
+        for (int index = (int) size.getHeight() / 2; index > 0; index -= UNIT_SEGMENT_COEFFICIENT) {
             graph.drawLine(size.width / 2 - 3, index, size.width / 2, index);
+            graph.drawString(Integer.toString(counter), (int) size.getWidth() / 2, index - UNIT_SEGMENT_COEFFICIENT);
+            counter--;
         }
     }
 
@@ -69,29 +93,27 @@ public class GraphicComponent extends JPanel {
             double tempX = (values.get(index)).getX();
             double prevFx = (values.get(index - 1)).getY();
             double prevX = (values.get(index - 1)).getX();
-            int newFx = (int) (10 * tempFx);
-            int newX = (int) (10 * tempX);
-            int newprevFx = (int) (10 * prevFx);
-            int newPrevX = (int) (10 * prevX);
+            int newFx = (int) (UNIT_SEGMENT_COEFFICIENT * tempFx);
+            int newX = (int) (UNIT_SEGMENT_COEFFICIENT * tempX);
+            int newprevFx = (int) (UNIT_SEGMENT_COEFFICIENT * prevFx);
+            int newPrevX = (int) (UNIT_SEGMENT_COEFFICIENT * prevX);
             graph.setColor(Color.BLUE);
-            int drawPrevX = center.width + 4 * newPrevX;
+            int drawPrevX = center.width + newPrevX;
             int drawPrevY = center.height - newprevFx;
-            int drawX = center.width + 4 * newX;
+            int drawX = center.width + newX;
             int drawY = center.height - newFx;
             graph.drawLine(drawPrevX, drawPrevY, drawX, drawY);
             graph.setColor(Color.DARK_GRAY);
-            /*if (index == 1) {
-                String stringX = (values.get(0)).getX().toString();
-                String stringY = (values.get(0)).getY().toString();
-                graph.drawString(stringX, drawPrevX, size.height / 2 + 20);
-                graph.drawString(stringY, size.width / 2 - 30, drawPrevY);
-            }
-            if (values.get(index).get(0) % 1 == 0) {
-                String stringX = (values.get(index)).get(0).toString();
-                String stringY = (values.get(index)).get(1).toString();
-                graph.drawString(stringX, drawX, size.height / 2 + 20);
-                graph.drawString(stringY, size.width / 2 - 30, drawY);
-            }*/
+        }
+    }
+
+    private void extendChart(int pointX, int pointY) {
+        while (pointX * UNIT_SEGMENT_COEFFICIENT > getSize().getWidth() / 2 || pointY * UNIT_SEGMENT_COEFFICIENT > getSize().getHeight() / 2) {
+            setSize((int) getSize().getWidth() + EXTEND_RATIO,
+                    (int) getSize().getHeight() + EXTEND_RATIO);
+            this.size = getSize();
+            setPreferredSize(size);
+            revalidate();
         }
     }
 
@@ -134,7 +156,13 @@ public class GraphicComponent extends JPanel {
 
 
     public void clear() {
-        valuesLinear.clear();
+        this.size = firstSize;
+        setSize(size);
+        setPreferredSize(size);
+        revalidate();
+        functionsData.clear();
+        functionsData.add(new ArrayList<>());
+        functionsData.add(new ArrayList<>());
     }
 
     public void setFontSize(int fontSize) {
@@ -159,5 +187,6 @@ public class GraphicComponent extends JPanel {
 
     public void addValue(int id, GraphicPoint point) {
         functionsData.get(id).add(point);
+        extendChart((int) point.getX(), (int) point.getY());
     }
 }

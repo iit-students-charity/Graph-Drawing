@@ -1,5 +1,7 @@
 package view;
 
+import model.GraphicPoint;
+
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
@@ -32,6 +34,18 @@ public class PointsTable {
 
     public JScrollPane getScrollPane() {
         return scrollPane;
+    }
+
+    public void addValue(GraphicPoint point) {
+        Vector<Double> vector = new Vector<>();
+        vector.add(point.getX());
+        vector.add(point.getY());
+        model.addRow(vector);
+    }
+
+    public void clear() {
+        model = new DefaultTableModel(columns, 0);
+        table.setModel(model);
     }
 
     /*public void update() {

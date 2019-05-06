@@ -26,11 +26,39 @@ public class TaskPanel {
         panel.add(buttonStart);
         panel.add(buttonStop);
         panel.setVisible(true);
+        nValue.setText("100");
+        kValue.setText("10000");
         return panel;
+    }
+
+    int getN() {
+        String stringValue = nValue.getText();
+        if (!stringValue.equals("")) {
+            return Integer.parseInt(stringValue);
+        }
+        {
+            return 5;
+        }
+
+    }
+
+    int getK() {
+        String stringValue = kValue.getText();
+        if (!stringValue.equals("")) {
+            return Integer.parseInt(stringValue);
+        }
+        {
+            return 10000;
+        }
+
     }
 
     public JButton getMainButton() {
         return buttonStart;
+    }
+
+    JButton getButtonStop() {
+        return buttonStop;
     }
 
 

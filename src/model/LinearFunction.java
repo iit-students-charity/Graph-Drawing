@@ -1,6 +1,6 @@
 package model;
 
-import view.GraphicComponent;
+import view.MainFrame;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,15 +17,15 @@ public class LinearFunction implements Runnable, Function {
     public static final int FUNCTION_ID = 0;
     private List<GraphicPoint> data;
     private double step;
-    private GraphicComponent graphicComponent;
+    private MainFrame frame;
 
-    public LinearFunction(Lock lock, GraphicComponent graphic) {
+    public LinearFunction(Lock lock, MainFrame frame) {
         this.lock = lock;
         beginI = 0;
-        endI = 500;
+        endI = 50;
         this.data = new ArrayList<>();
         this.step = 0.1;
-        this.graphicComponent = graphic;
+        this.frame = frame;
     }
 
     public double function(double x) {
@@ -45,16 +45,16 @@ public class LinearFunction implements Runnable, Function {
             data.add(secondPoint);
             lock.lock();
             try {
-                graphicComponent.addValue(FUNCTION_ID, secondPoint);
-                graphicComponent.repaint();
+                frame.getGraphic().addValue(FUNCTION_ID, secondPoint);
+                frame.getGraphic().repaint();
             } finally {
                 lock.unlock();
             }
-            try {
-                    Thread.sleep(50);
+            /*try {
+                    Thread.sleep(70);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
-            }
+            }*/
         }
 
     }

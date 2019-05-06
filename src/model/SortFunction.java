@@ -1,7 +1,7 @@
 package model;
 
 import controller.Controller;
-import view.GraphicComponent;
+import view.MainFrame;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,115 +10,117 @@ import java.util.concurrent.locks.Lock;
 
 public class SortFunction implements Runnable {
     public static final int FUNCTION_ID = 1;
-    private static final int STRAP_DIGIT = 100;
+    private static final int STRAP_DIGIT = 10;
     private int n; //длина массивов
     private int k; //количество сортируемых массивов
-    private int currentArraySize;
     private Controller controller;
     private Lock lock;
     private List<GraphicPoint> data;
-    private GraphicComponent graphicComponent;
+    private MainFrame frame;
+    private int sleepTime;
+    private int peakLimit;
 
-    public SortFunction(int n, int k, Lock lock, GraphicComponent graphicComponent) {
+
+    public SortFunction(int n, int k, Lock lock, MainFrame frame) {
         this.n = n;
         this.k = k;
-        this.currentArraySize = 2;
         this.lock = lock;
         data = new ArrayList<>();
-        this.graphicComponent = graphicComponent;
+        this.frame = frame;
+        sleepTime = 500;
+        peakLimit = 2000;
     }
 
     @Override
     public void run() {
         for (int currentSize = 2; currentSize < n; currentSize++) {
-            lock.lock();
-            currentArraySize = currentSize;
-            try {
                 int commonTime = 0;
-                int currentStep;
                 for (int currentArrayCount = 1; currentArrayCount < k; currentArrayCount++) {
-                    commonTime += sortTime(generateRandomArray());
-
-
+                    commonTime += sortTime(generateRandomArray(currentSize));
                 }
                 int averageTime = commonTime / k;
-                //data.add(new GraphicPoint(currentArraySize, averageTime));
-                graphicComponent.addValue(FUNCTION_ID, new GraphicPoint(currentArraySize, averageTime));
-                System.out.print(currentArraySize);
-                System.out.print(" ");
-                System.out.println(averageTime);
+            lock.lock();
+            try {
+                GraphicPoint point = new GraphicPoint(currentSize, averageTime);
+                frame.getGraphic().addValue(FUNCTION_ID, point);
+                frame.getMainPointsTable().addValue(point);
+                frame.getGraphic().repaint();
             } finally {
                 lock.unlock();
             }
-            /*try {
-                Thread.sleep(500);
-            }
-            catch (InterruptedException e)
-            {
-                System.out.println("thread interrupted");
-            }*/
 
+            try {
+                Thread.sleep(sleepTime);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                currentSize = n;
+            }
         }
     }
 
 
-    private void countingSort(int[] arrayToSort) {
-        int n = arrayToSort.length;
+    private int[] countingSort(int[] array) {
+        // array to be sorted in, this array is necessary
+        // when we sort object datatypes, if we don't,
+        // we can sort directly into the input array
+        int[] aux = new int[array.length];
 
-        // The output character array that will have sorted arr
-        int output[] = new int[n];
-
-        // Create a count array to store count of individual
-        // characters and initialize count array as 0
-        int count[] = new int[currentArraySize];
-        for (int i = 0; i < currentArraySize; ++i)
-            count[i] = 0;
-
-        // store count of each character
-        for (int i = 0; i < n; ++i)
-            ++count[arrayToSort[i]];
-
-        // Change count[i] so that count[i] now contains actual
-        // position of this character in output array
-        for (int i = 1; i <= currentArraySize - 1; ++i)
-            count[i] += count[i - 1];
-
-        // Build the output character array
-        // To make it stable we are operating in reverse order.
-        for (int i = n - 1; i >= 0; i--) {
-            output[count[arrayToSort[i]] - 1] = arrayToSort[i];
-            --count[arrayToSort[i]];
+        // find the smallest and the largest value
+        int min = array[0];
+        int max = array[0];
+        for (int i = 1; i < array.length; i++) {
+            if (array[i] < min) {
+                min = array[i];
+            } else if (array[i] > max) {
+                max = array[i];
+            }
         }
 
-        // Copy the output array to arr, so that arr now
-        // contains sorted characters
-        for (int i = 0; i < n; ++i)
-            arrayToSort[i] = output[i];
+        // init array of frequencies
+        int[] counts = new int[max - min + 1];
+
+        // init the frequencies
+        for (int i = 0; i < array.length; i++) {
+            counts[array[i] - min]++;
+        }
+
+        // recalculate the array - create the array of occurences
+        counts[0]--;
+        for (int i = 1; i < counts.length; i++) {
+            counts[i] = counts[i] + counts[i - 1];
+        }
+
+    /*
+      Sort the array right to the left
+      1) Look up in the array of occurences the last occurence of the given value
+      2) Place it into the sorted array
+      3) Decrement the index of the last occurence of the given value
+      4) Continue with the previous value of the input array (goto set1),
+         terminate if all values were already sorted
+    */
+        for (int i = array.length - 1; i >= 0; i--) {
+            aux[counts[array[i] - min]--] = array[i];
+        }
+
+        return aux;
     }
 
     private long sortTime(int[] arrayToSort) {
-        long startTime = System.nanoTime();
+        long startTime = System.nanoTime() / STRAP_DIGIT;
         countingSort(arrayToSort);
-        long endTime = System.nanoTime();
-        return (endTime - startTime) / STRAP_DIGIT;
-    }
-
-    private int[] generateRandomArray() {
-        int[] result = new int[currentArraySize];
-        Random random = new Random();
-        for (int i = 0; i < result.length; i++) {
-            result[i] = random.nextInt(currentArraySize);
+        long endTime = System.nanoTime() / STRAP_DIGIT;
+        long result = endTime - startTime;
+        if (result > peakLimit) {
+            result = sortTime(arrayToSort);
         }
         return result;
     }
 
-    public List<GraphicPoint> getData() {
-        List<GraphicPoint> result;
-        lock.lock();
-        try {
-            result = this.data;
-        } finally {
-            lock.unlock();
+    private int[] generateRandomArray(int currentArraySize) {
+        int[] result = new int[currentArraySize];
+        Random random = new Random();
+        for (int i = 0; i < result.length; i++) {
+            result[i] = random.nextInt(currentArraySize);
         }
         return result;
     }
