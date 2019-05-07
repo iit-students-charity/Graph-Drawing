@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.locks.Lock;
 
-public class LinearFunction implements Runnable, Function {
+public class LinearFunction implements Runnable/*, Function*/ {
 
     public double x;
     public double beginI;
@@ -31,6 +31,7 @@ public class LinearFunction implements Runnable, Function {
     public double function(double x) {
         return 5 * x - 3;
     }
+
 
     @Override
     public void run() {
